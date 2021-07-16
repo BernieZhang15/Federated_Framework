@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="RemoteMappingsManager">
+    <list>
+      <list>
+        <remote-mappings server-id="python@sftp://lscsc@10.20.7.41:22/media/lscsc/export/zhangboning/anaconda3/envs/pytorch_gpu/bin/python3">
+          <settings>
+            <list>
+              <mapping local-root="$PROJECT_DIR$" remote-root="/media/lscsc/export/zhangboning/Federated_Framework" />
+            </list>
+          </settings>
+        </remote-mappings>
+        <remote-mappings server-id="python@sftp://lscsc@10.20.7.17:22/media/lscsc/export/zhangboning/anaconda3/envs/pytorch_gpu/bin/python3" />
+      </list>
+    </list>
+  </component>
+</project>

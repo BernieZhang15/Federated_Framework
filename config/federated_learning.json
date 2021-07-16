@@ -1,0 +1,39 @@
+{
+"main" :
+[{
+	"dataset" : ["fashionmnist"],
+	"net" : ["logistic"],
+	"iterations" : [2000],
+	"n_clients" : [2000],
+	"participation_rate" : [0.5],
+	"classes_per_client" : [10],
+	"batch_size" : [1],
+	"balancedness" : [1.0],
+	"momentum" : [0.9],
+	"compression" : [["none", {}]],
+	"log_frequency" : [30],
+	"log_path" : ["result/trash/"]
+}],
+"Seg" :
+[{
+	"dataset" : ["AIS_Data"],
+	"net" : ["SegUNet"],
+	"iterations" : [2000],
+	"n_clients" : [5],
+	"participation_rate" : [1.0],
+	"balancedness" : [1.0],
+	"compression" : [["fed_avg", {"n": 5}]],
+	"log_frequency" : [1],
+	"log_path" : ["result/SegUNet_FedAvg/"]
+},{
+	"dataset" : ["AIS_Data"],
+	"net" : ["SegUNet"],
+	"iterations" : [2000],
+	"n_clients" : [5],
+	"participation_rate" : [1.0],
+	"balancedness" : [1.0],
+	"compression" : [["stc_updown", {"p_up": 0.1, "p_down": 0.1}]],
+	"log_frequency" : [10],
+	"log_path" : ["result/SegUNet_STC/"]
+}]
+}
