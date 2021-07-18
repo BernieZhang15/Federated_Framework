@@ -27,7 +27,9 @@ class BinaryDiceLoss(nn.Module):
         self.smooth = smooth
 
     def forward(self, predict, target):
-        predict, index = torch.max(predict, 1)
+        predict = torch.softmax(predict, dim=1)
+        predict = predict[:, 1]
+
 
         predict = predict.contiguous().view(predict.shape[0], -1)
         target = target.contiguous().view(target.shape[0], -1)
@@ -72,3 +74,9 @@ class DiceLoss(nn.Module):
                 total_loss += dice_loss
 
         return total_loss/target.shape[1]
+
+if __name__=="__main__":
+    input = torch.randn(3,2,3,3)
+    target = torch.randint(0, 2, (3,3,3))
+    dice = BinaryDiceLoss()
+    result = dice(input, target)
