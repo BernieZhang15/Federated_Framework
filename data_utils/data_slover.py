@@ -61,24 +61,27 @@ def get_cifar10():
     return x_train, y_train, x_test, y_test
 
 
-def get_ais_data():
-    print("Loading AIS data..")
-    cities = ["austin", "chicago", "kitsap", "vienna", "tyrol-w"]
+def get_ais_data(cities_train=None, cities_val=None):
+    print("Loading Aerial Dataset..")
+
     train_data = {}
     train_label = {}
+    validation_data = {}
+    validation_label = {}
 
-    for city in cities:
+    for city in cities_train:
         train_path = os.path.join('..', 'Data', 'Aerial Dataset', 'Train', city)
-        img_sets = read_image(os.path.join(train_path, 'image'))
-        train_data[city] = img_sets
-        label_sets = read_label2(os.path.join(train_path, 'label'))
-        train_label[city] = label_sets
-
-    validation_path = os.path.join('..', 'Data', 'Aerial Dataset', 'Val')
-    validation_data = read_image(os.path.join(validation_path, 'image'))
-    validation_label = read_label2(os.path.join(validation_path, 'label'))
-
-    print("AIS data loading finished\n")
+        train_img_sets = read_image(os.path.join(train_path, 'image'))
+        train_data[city] = train_img_sets
+        train_label_sets = read_label2(os.path.join(train_path, 'label'))
+        train_label[city] = train_label_sets
+        if city in cities_val:
+            validation_path = os.path.join('..', 'Data', 'Aerial Dataset', 'Val', city)
+            val_img_sets = read_image(os.path.join(validation_path, 'image'))
+            validation_data[city] = val_img_sets
+            val_label_sets = read_label2(os.path.join(validation_path, 'label'))
+            validation_label[city] = val_label_sets
+    print("Aerial Dataset loading finished\n")
     return train_data, train_label, validation_data, validation_label
 
 
@@ -211,18 +214,17 @@ def get_default_data_transforms(name, train=True, verbose=True):
     return transforms_train[name], transforms_eval[name]
 
 
-def get_data_loaders(hp, verbose=True):
+def get_data_loaders(hp, verbose=True, cities_train=None, cities_val=None):
     if hp['net'] == 'SegUNet' or hp['net'] == 'ResUNet':
-        cities = ["austin", "chicago", "kitsap", "vienna", "tyrol-w"]
-        x_train, y_train, x_test, y_test = get_ais_data()
-        client_loaders = [torch.utils.data.DataLoader(CustomImageDataset(x_train[city], y_train[city]),
+        x_train, y_train, x_test, y_test = get_ais_data(cities_train=cities_train, cities_val=cities_val)
+        client_loaders = {city: torch.utils.data.DataLoader(CustomImageDataset(x_train[city], y_train[city]),
                                                       batch_size=hp['batch_size'], shuffle=True, num_workers=10)
-                                                      for city in cities]
-        train_loader = torch.utils.data.DataLoader(CustomImageDataset(x_test, y_test), batch_size=5, shuffle=True,
-                                                   num_workers=10)
-        test_loader = torch.utils.data.DataLoader(CustomImageDataset(x_test, y_test), batch_size=5, shuffle=True,
-                                                  num_workers=10)
-        stats = {"split": [len(x_train[city]) for city in cities]}
+                                                      for city in cities_train}
+        train_loader = None
+        test_loader = {city: torch.utils.data.DataLoader(CustomImageDataset(x_test[city], y_test[city]),
+                                                      batch_size=1, shuffle=True, num_workers=10)
+                                                      for city in cities_val}
+        stats = {"split": [len(x_train[city]) for city in cities_train]}
 
     else:
         x_train, y_train, x_test, y_test = globals()['get_' + hp['dataset']]()

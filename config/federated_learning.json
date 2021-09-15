@@ -14,26 +14,30 @@
 	"log_frequency" : [30],
 	"log_path" : ["result/trash/"]
 }],
-"Seg" :
+
+"STC" :
 [{
 	"dataset" : ["AIS_Data"],
 	"net" : ["SegUNet"],
-	"iterations" : [2000],
+	"iterations" : [800],
 	"n_clients" : [5],
 	"participation_rate" : [1.0],
 	"balancedness" : [1.0],
-	"compression" : [["fed_avg", {"n": 5}]],
-	"log_frequency" : [1],
-	"log_path" : ["result/SegUNet_FedAvg/"]
-},{
+	"compression" : [["stc_updown", {"p_up": 0.1, "p_down":  0.1}]],
+	"log_frequency" : [5],
+	"log_path" : ["result/SegUNet_STC/"]
+}],
+
+"FedAvg" :
+[{
 	"dataset" : ["AIS_Data"],
 	"net" : ["SegUNet"],
-	"iterations" : [2000],
+	"iterations" : [800],
 	"n_clients" : [5],
 	"participation_rate" : [1.0],
 	"balancedness" : [1.0],
-	"compression" : [["stc_updown", {"p_up": 0.1, "p_down": 0.1}]],
-	"log_frequency" : [10],
-	"log_path" : ["result/SegUNet_STC/"]
+	"compression" : [["fed_avg", {"n": 20}]],
+	"log_frequency" : [5],
+	"log_path" : ["result/SegUNet_FedAvg/"]
 }]
 }

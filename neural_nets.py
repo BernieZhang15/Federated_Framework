@@ -189,12 +189,12 @@ class SegUNet(nn.Module):
         for i, module_down in enumerate(self.down_convs):
             rgb, before_pool_rgb = module_down(rgb)
             encoder_outs.append(before_pool_rgb)
-
+        fm = rgb
         for i, module_up in enumerate(self.up_convs):
             before_pool = encoder_outs[-(i + 2)]
             rgb = module_up(before_pool, rgb)
         x = self.conv_final(rgb)
-        return x
+        return x, fm
 
 
 class ResidualConv(nn.Module):

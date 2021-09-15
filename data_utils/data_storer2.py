@@ -4,29 +4,17 @@ import random
 import numpy as np
 
 if __name__ == '__main__':
-    source_path = "D:\\pythonProject\\Data\\Aerial Dataset\\Train"
-    train_path = "C:\\Users\\berniezhang\\Desktop\\Aerial Dataset\\Train"
-    val_path = "C:\\Users\\berniezhang\\Desktop\\Aerial Dataset\\Val"
-    central_path = "C:\\Users\\berniezhang\\Desktop\\Aerial Dataset\\Central\\"
+    source_path = "D:\\pythonProject\\Data\\AIS_Data\\Train"
+    train_path = "C:\\Users\\berniezhang\\Desktop\\AIS_Data\\Train"
+    val_path = "C:\\Users\\berniezhang\\Desktop\\AIS_Data\\Val"
+    central_path = "C:\\Users\\berniezhang\\Desktop\\AIS_Data\\Central\\"
 
-    cities = ["chicago", "austin", "kitsap", "tyrol-w", "vienna"]
-    # cities2 = ["bellingham", "bloomington", "innsbruck", "sfo", "tyrol-e"]
+    cities = ["berlin", "chicago", "paris", "potsdam", "zurich"]
+    city_dict = {"berlin": 2550, "chicago": 9030, "paris": 11319, "potsdam": 539, "zurich": 6895, "tokyo": 35}
 
     for city in cities:
         print("Processing data from {}".format(city))
-        # img_index = random.sample(range(3600), 10)
-        img_index = []
-        if city == 'austin':
-            img_index = range(41, 51)
-        elif city == "chicago":
-            img_index = range(231, 241)
-        elif city == "kitsap":
-            img_index = range(1841, 1851)
-        elif city == "tyrol-w":
-            img_index = range(2051, 2061)
-        elif city == "vienna":
-            img_index = range(261, 271)
-
+        img_index = random.sample(range(city_dict[city]), 20)
         for i, num in enumerate(img_index):
             img_path = os.path.join(source_path, city, "image\\split_{}.png".format(num))
             if os.path.exists(img_path):
@@ -48,8 +36,8 @@ if __name__ == '__main__':
                 os.makedirs(label_dest)
             cv2.imwrite(os.path.join(label_dest, "split_{}.png".format(i + 1)), label)
 
-        val_indexs = np.delete(range(3600), img_index)
-        val_index = np.random.choice(val_indexs, 10)
+        val_indexs = np.delete(range(city_dict[city]), img_index)
+        val_index = np.random.choice(val_indexs, 20)
         for i, num in enumerate(val_index):
             img_path = os.path.join(source_path, city, "image\\split_{}.png".format(num))
             label_path = os.path.join(source_path, city, "label\\split_{}.png".format(num))
@@ -66,11 +54,11 @@ if __name__ == '__main__':
             cv2.imwrite(os.path.join(img_dest, "split_{}.png".format(i + 1)), img)
             cv2.imwrite(os.path.join(label_dest, "split_{}.png".format(i + 1)), label)
 
-    count = 1
+    count = 121
     for city in cities:
         img_path = os.path.join(train_path, city, "image")
         label_path = os.path.join(train_path, city, "label")
-        for i in range(1, 11):
+        for i in range(1, 21):
             source_img = os.path.join(img_path, "split_{}.png".format(i))
             source_label = os.path.join(label_path, "split_{}.png".format(i))
             if os.path.exists(source_img):

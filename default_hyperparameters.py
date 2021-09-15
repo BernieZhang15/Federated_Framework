@@ -27,12 +27,12 @@ hp_net_dict = {
          'lr_decay': ['LambdaLR', {'lr_lambda': lambda epoch: 0.99 ** epoch}], 'iterations': 36000},
 
     'SegUNet':
-        {'lr': 0.0005, 'momentum': 0.9, 'batch_size': 5, 'weight_decay': 5e-4,
+        {'lr': 0.0005, 'momentum': 0.9, 'batch_size': 1, 'weight_decay': 5e-4,
          'lr_decay': ['LambdaLR', {'lr_lambda': lambda epoch: 0.995 ** epoch}], 'iterations': 36000,
-         'local_iterations': 1},
+         'local_iterations': 5},
 
     'ResUNet':
-        {'lr': 0.0005, 'momentum': 0.9, 'batch_size': 5, 'weight_decay': 5e-4,
+        {'lr': 0.0005, 'momentum': 0.9, 'batch_size': 2, 'weight_decay': 5e-4,
          'lr_decay': ['LambdaLR', {'lr_lambda': lambda epoch: 0.99 ** epoch}], 'iterations': 36000,
          'local_iterations': 1}
 }

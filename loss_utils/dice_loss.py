@@ -11,12 +11,12 @@ def make_one_hot(input, num_classes):
     Returns:
         A tensor of shape [N, num_classes, *]
     """
+
     shape = np.array(input.shape)
     shape[1] = num_classes
     shape = tuple(shape)
     result = torch.zeros(shape)
     result = result.scatter_(1, input.cpu(), 1)
-
     return result
 
 
@@ -27,10 +27,6 @@ class BinaryDiceLoss(nn.Module):
         self.smooth = smooth
 
     def forward(self, predict, target):
-        predict = torch.softmax(predict, dim=1)
-        predict = predict[:, 1]
-
-
         predict = predict.contiguous().view(predict.shape[0], -1)
         target = target.contiguous().view(target.shape[0], -1)
 
@@ -52,31 +48,32 @@ class DiceLoss(nn.Module):
     Return:
         same as BinaryDiceLoss
     """
-    def __init__(self, weight=None, ignore_index=None, **kwargs):
+    def __init__(self, num_class, weight=None, ignore_index=None, **kwargs):
         super(DiceLoss, self).__init__()
         self.kwargs = kwargs
         self.weight = weight
         self.ignore_index = ignore_index
+        self.num_class = num_class
+        self.device = "cuda"
 
     def forward(self, predict, target):
-        assert predict.shape == target.shape, 'predict & target shape do not match'
-        dice = BinaryDiceLoss(**self.kwargs)
         total_loss = 0
+        dice = BinaryDiceLoss(**self.kwargs)
         predict = F.softmax(predict, dim=1)
+        target = torch.unsqueeze(target, dim=1)
+        target = make_one_hot(target, self.num_class).to(self.device)
 
-        for i in range(target.shape[1]):
+        for i in range(self.num_class):
             if i != self.ignore_index:
                 dice_loss = dice(predict[:, i], target[:, i])
                 if self.weight is not None:
-                    assert self.weight.shape[0] == target.shape[1], \
-                        'Expect weight shape [{}], get[{}]'.format(target.shape[1], self.weight.shape[0])
                     dice_loss *= self.weights[i]
                 total_loss += dice_loss
 
-        return total_loss/target.shape[1]
+        return total_loss/self.num_class
 
 if __name__=="__main__":
     input = torch.randn(3,2,3,3)
     target = torch.randint(0, 2, (3,3,3))
-    dice = BinaryDiceLoss()
+    dice = DiceLoss()
     result = dice(input, target)

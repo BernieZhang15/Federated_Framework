@@ -4,40 +4,22 @@ import torch
 import numpy as np
 from neural_nets import SegUNet
 from torch.utils.data.dataset import Dataset
-from data_utils.data_module import read_label, read_image, CustomImageDataset
+from data_utils.data_module import read_label, read_image, CustomImageDataset, convert_backward2
 
 if __name__ == "__main__":
 
-    print("Loading AIS data..")
+    print("Loading Aerial Dataset..")
 
-    test_path = os.path.join('..', 'Data', 'AIS_Data', 'Val')
+    test_path = os.path.join('..', 'Data', 'Aerial Dataset', 'Val', 'chicago')
     test_img = read_image(os.path.join(test_path, 'image'))
     test_labels = read_label(os.path.join(test_path, 'label'))
 
-
-    def convert_backward(image):
-        y = np.zeros((512, 512, 3))
-        index1 = torch.where(image == 0)
-        y[index1[1], index1[2]] = [0, 0, 255]
-        index2 = torch.where(image == 1)
-        y[index2[1], index2[2]] = [255, 255, 255]
-        index3 = torch.where(image == 2)
-        y[index3[1], index3[2]] = [255, 0, 0]
-        return y
-
-    def convert_backward2(image):
-        y = np.zeros((512, 512, 3))
-        index1 = torch.where(image == 0)
-        y[index1[1], index1[2]] = [0, 0, 0]
-        index2 = torch.where(image == 1)
-        y[index2[1], index2[2]] = [255, 255, 255]
-        return y
 
     print('[INFO] Test and display the performance')
 
     device = 'cuda'
     model = SegUNet().to(device)
-    path = os.path.join("result", "distributed", "model_checkpoint_2.pth.tar")
+    path = os.path.join("result", "distributed", "model_fedavg_5_80.pth.tar")
     checkpoint = torch.load(path)
     model.load_state_dict(checkpoint)
     model.eval()
@@ -60,9 +42,9 @@ if __name__ == "__main__":
         test_seg_scores.append(np.mean((test_preds == label).data.cpu().numpy()))
 
         # convert back to image
-        test_preds = convert_backward(test_preds.cpu())
+        test_preds = convert_backward2(test_preds.cpu())
         cv2.imwrite(os.path.join('result', 'Distributed_Image', 'predict_{}.jpg'.format(i)), test_preds)
-        label = convert_backward(label.cpu())
+        label = convert_backward2(label.cpu())
         cv2.imwrite(os.path.join('result', 'Distributed_Image', 'gt_{}.jpg'.format(i)), label)
 
     global_acc = np.mean(test_seg_scores)
